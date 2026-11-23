@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  # "/" holds the sample's AGP and the Gradle wrapper, "/plugin" the plugin's own build.
+  - package-ecosystem: "gradle"
+    directories:
+      - "/"
+      - "/plugin"
+    schedule:
+      interval: "monthly"
+    groups:
+      # Minor and patch updates in one pull request; majors get their own.
+      gradle-minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      # The plugin is compiled against this AGP API on purpose: raising it could pull in API that
+      # older AGP versions (down to the oldest one in the CI matrix) don't have. Bump it deliberately.
+      - dependency-name: "com.android.tools.build:gradle-api"
