@@ -23,6 +23,7 @@ Requirements: JDK 17 and the Android SDK (for the sample).
 
 ```bash
 ./gradlew -p plugin test validatePlugins     # unit tests + plugin validation
+./gradlew -p plugin functionalTest           # real Android builds through Gradle TestKit
 ./gradlew :sample:assembleDebug              # end-to-end; output in sample/build/generated/res
 ```
 
@@ -30,7 +31,8 @@ CI runs both on every push and pull request.
 
 ## Pull requests
 
-- Keep a pull request to one change, with tests where it makes sense (`plugin/src/test`).
+- Keep a pull request to one change, with tests where it makes sense: unit tests in
+  `plugin/src/test`, plugin behavior (DSL, variants, build failures) in `plugin/src/functionalTest`.
 - Add a line under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) for anything users will
   notice (new options, behavior changes, fixes).
 - Keep the plugin [configuration cache](https://docs.gradle.org/current/userguide/configuration_cache.html)

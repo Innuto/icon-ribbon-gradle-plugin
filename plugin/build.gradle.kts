@@ -43,6 +43,55 @@ tasks.test {
     systemProperty("java.awt.headless", "true")
 }
 
+// Functional tests: real Android builds in temporary projects, run through Gradle TestKit.
+val functionalTest: SourceSet by sourceSets.creating
+gradlePlugin.testSourceSets(functionalTest)
+configurations[functionalTest.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
+configurations[functionalTest.runtimeOnlyConfigurationName].extendsFrom(configurations.testRuntimeOnly.get())
+
+// The AGP the test builds run with, e.g. `-PtestAgpVersion=8.4.2`. It goes onto the injected plugin
+// classpath next to this plugin; applied separately, its classes would be invisible to ours.
+val testAgpVersion = providers.gradleProperty("testAgpVersion").orElse("8.10.1")
+val testAgp: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+dependencies {
+    testAgp(testAgpVersion.map { "com.android.tools.build:gradle:$it" })
+}
+tasks.pluginUnderTestMetadata {
+    pluginClasspath.from(testAgp)
+}
+
+val androidSdk = providers.environmentVariable("ANDROID_HOME")
+    .orElse(providers.environmentVariable("ANDROID_SDK_ROOT"))
+    .orElse(
+        providers.fileContents(layout.projectDirectory.file("../local.properties")).asText.map { text ->
+            text.lines().first { it.startsWith("sdk.dir=") }.substringAfter("=").trim()
+        },
+    )
+
+val functionalTestTask = tasks.register<Test>("functionalTest") {
+    description = "Runs Android builds with the plugin applied, through Gradle TestKit."
+    group = "verification"
+    testClassesDirs = functionalTest.output.classesDirs
+    classpath = functionalTest.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty("java.awt.headless", "true")
+    inputs.property("testAgpVersion", testAgpVersion)
+    // Gradle version of the test builds, e.g. `-PtestGradleVersion=8.6`; defaults to this build's Gradle.
+    providers.gradleProperty("testGradleVersion").orNull?.let {
+        inputs.property("testGradleVersion", it)
+        systemProperty("testGradleVersion", it)
+    }
+    // Lazy, and not an input: the SDK path differs between machines.
+    jvmArgumentProviders.add(CommandLineArgumentProvider { listOf("-DandroidSdk=${androidSdk.get()}") })
+    shouldRunAfter(tasks.test)
+}
+tasks.check {
+    dependsOn(functionalTestTask)
+}
+
 gradlePlugin {
     website = repositoryUrl
     vcsUrl = repositoryUrl

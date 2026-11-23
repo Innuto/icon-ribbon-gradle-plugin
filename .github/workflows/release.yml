@@ -31,7 +31,7 @@ jobs:
       # Two invocations: `-p plugin` applies to the whole command, so `:sample` would be looked up
       # inside the plugin build and not found.
       - name: Test and validate plugin
-        run: ./gradlew -p plugin test validatePlugins
+        run: ./gradlew -p plugin test validatePlugins functionalTest
 
       - name: Build sample app (end-to-end)
         run: ./gradlew :sample:assembleDebug
