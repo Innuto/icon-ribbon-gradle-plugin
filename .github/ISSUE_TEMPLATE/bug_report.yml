@@ -1,0 +1,71 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! The details below help reproduce the problem quickly.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead? Screenshots of the icon help a lot.
+    validations:
+      required: true
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Plugin configuration
+      description: Your `iconRibbon { }` blocks and the related `productFlavors` / `buildTypes`.
+      render: kotlin
+    validations:
+      required: true
+
+  - type: textarea
+    id: icons
+    attributes:
+      label: Launcher icons
+      description: Which icon files does the app have, and in which folders? Are they PNG/WebP or adaptive icons?
+      placeholder: |
+        src/main/res/mipmap-anydpi-v26/ic_launcher.xml (adaptive)
+        src/main/res/mipmap-xxxhdpi/ic_launcher.webp
+        src/staging/res/mipmap-xxxhdpi/ic_launcher.webp
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: agp-version
+    attributes:
+      label: Android Gradle Plugin version
+      placeholder: "8.10.1"
+    validations:
+      required: true
+
+  - type: input
+    id: gradle-version
+    attributes:
+      label: Gradle version
+      placeholder: "8.11.1"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: JDK and OS
+      placeholder: "JDK 17, macOS 15 / Ubuntu 24.04 (CI)"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Build output
+      description: Error or `icon-ribbon:` warnings from the build, ideally with `--stacktrace`.
+      render: text
