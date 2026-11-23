@@ -74,14 +74,14 @@ different positions, otherwise the build fails naming both. An explicit `enabled
 in the chain (like `prod` above) keeps that variant's icon clean. Variants with no ribbon at all are
 left completely untouched.
 
-| Option            | Default              |
-|-------------------|----------------------|
-| `text`            | flavor / build type name, upper-cased |
-| `backgroundColor` | `#D32F2F` (`#RRGGBB` / `#AARRGGBB`) |
-| `textColor`       | `#FFFFFF`            |
+| Option            | Default                                                                               |
+|-------------------|---------------------------------------------------------------------------------------|
+| `text`            | flavor / build type name, upper-cased                                                 |
+| `backgroundColor` | `#D32F2F` (`#RRGGBB` / `#AARRGGBB`)                                                   |
+| `textColor`       | `#FFFFFF`                                                                             |
 | `position`        | `TOP_RIGHT` (`TOP_LEFT`, `TOP_RIGHT`, `BOTTOM_LEFT`, `BOTTOM_RIGHT`, `TOP`, `BOTTOM`) |
-| `enabled`         | `true` once `iconRibbon { }` is used |
-| `iconNames`       | module-wide list (see below) |
+| `enabled`         | `true` once `iconRibbon { }` is used                                                  |
+| `iconNames`       | module-wide list (see below)                                                          |
 
 ### Which icons are decorated
 
@@ -129,11 +129,11 @@ productFlavors {
 Each cell shows the legacy PNG icon (left) and the adaptive icon (right). The adaptive icon is
 pictured under a circular launcher mask; other launchers use other mask shapes.
 
-| | debug | release |
-|---|---|---|
-| **dev** | ![devDebug](docs/images/dev-debug.png) | ![devRelease](docs/images/dev-release.png) |
-| **staging** | ![stagingDebug](docs/images/staging-debug.png) | ![stagingRelease](docs/images/staging-release.png) |
-| **prod** | ![prodDebug](docs/images/prod-debug.png) | ![prodRelease](docs/images/prod-release.png) <br> untouched |
+|             | debug                                          | release                                                     |
+|-------------|------------------------------------------------|-------------------------------------------------------------|
+| **dev**     | ![devDebug](docs/images/dev-debug.png)         | ![devRelease](docs/images/dev-release.png)                  |
+| **staging** | ![stagingDebug](docs/images/staging-debug.png) | ![stagingRelease](docs/images/staging-release.png)          |
+| **prod**    | ![prodDebug](docs/images/prod-debug.png)       | ![prodRelease](docs/images/prod-release.png) <br> untouched |
 
 The sample's `staging` flavor has its own green icon: a legacy PNG in
 `src/staging/res/mipmap-xxxhdpi/` and the adaptive background color in `src/staging/res/values/`.
@@ -160,8 +160,8 @@ respected, the plugin decorates whichever file AGP would have picked.
 
 ## Requirements
 
-- AGP 8.4+ (`com.android.application`)
-- Gradle 8.6+ (required by AGP 8.4)
+- AGP 8.4+ (`com.android.application`), tested up to AGP 9.5
+- Gradle 8.6+ (required by AGP 8.4), tested up to Gradle 9.9
 - JDK 17
 - Configuration-cache compatible
 
@@ -175,6 +175,7 @@ respected, the plugin decorates whichever file AGP would have picked.
 
 ```bash
 ./gradlew -p plugin test validatePlugins     # unit tests + plugin validation
+./gradlew -p plugin functionalTest           # Android builds through TestKit (-PtestAgpVersion=8.x.y)
 ./gradlew :sample:assembleStagingDebug       # end-to-end; output in sample/build/generated/res
 ./gradlew -p plugin publishToMavenLocal      # try it in another project via mavenLocal()
 ```

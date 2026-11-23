@@ -10,6 +10,7 @@ Add entries under **Unreleased** as you make changes; the release turns that sec
 
 ### Added
 - Configuration cache compatibility is declared on the Gradle Plugin Portal.
+- Tested with AGP 8.4 to 9.5 and Gradle 8.6 to 9.9, including AGP 9.
 
 ## [0.1.0] - 2026-11-23
 
