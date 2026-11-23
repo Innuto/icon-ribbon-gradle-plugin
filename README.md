@@ -181,9 +181,13 @@ respected, the plugin decorates whichever file AGP would have picked.
 
 ### Releasing
 
-1. Bump `version` in `plugin/gradle.properties`.
-2. Push a matching tag: `git tag v0.2.0 && git push origin v0.2.0`.
-3. The [Release workflow](.github/workflows/release.yml) tests and runs `publishPlugins`.
+1. In [`CHANGELOG.md`](CHANGELOG.md), rename `## [Unreleased]` to `## [0.2.0] - <date>`, add a
+   fresh empty `## [Unreleased]` above it and update the compare links at the bottom.
+2. Bump `version` in `plugin/gradle.properties`.
+3. Push a matching tag: `git tag v0.2.0 && git push origin v0.2.0`.
+4. The [Release workflow](.github/workflows/release.yml) checks the changelog has a `0.2.0`
+   section, tests, runs `publishPlugins`, creates the GitHub Release from that section and updates
+   the versions in this README.
 
 It needs the `GRADLE_PUBLISH_KEY` and `GRADLE_PUBLISH_SECRET` repository secrets (API key from your
 [Plugin Portal account](https://plugins.gradle.org/user/login)).

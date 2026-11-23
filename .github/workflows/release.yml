@@ -24,6 +24,10 @@ jobs:
             exit 1
           fi
 
+      # Before the (irreversible) publish, so a version can't go out without release notes.
+      - name: Check CHANGELOG has this version
+        run: .github/scripts/changelog-section.sh "${GITHUB_REF_NAME#v}" > /dev/null
+
       # Two invocations: `-p plugin` applies to the whole command, so `:sample` would be looked up
       # inside the plugin build and not found.
       - name: Test and validate plugin
@@ -37,3 +41,49 @@ jobs:
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+
+  # GitHub Release for the tag, with this version's CHANGELOG.md section as the notes.
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          {
+            .github/scripts/changelog-section.sh "$version"
+            echo
+            echo "**Gradle Plugin Portal:** https://plugins.gradle.org/plugin/eu.innuto.iconribbon/$version"
+          } > release-notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$version" --notes-file release-notes.md
+
+  # Only after a successful publish: points the README's install snippets at the new version.
+  update-readme:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update version in README
+        run: |
+          export VERSION="${GITHUB_REF_NAME#v}"
+          # Matches `id("eu.innuto.iconribbon") version "…"` and the version catalog's `version = "…"`.
+          perl -pi -e 's/(eu\.innuto\.iconribbon"[),]? version ?=? ?")[^"]+/${1}$ENV{VERSION}/' README.md
+          if git diff --quiet; then
+            echo "README already at $VERSION"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update README to $VERSION"
+          git push

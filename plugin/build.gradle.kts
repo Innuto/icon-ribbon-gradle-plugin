@@ -1,10 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     `java-gradle-plugin`
     kotlin("jvm") version "2.1.10"
-    id("com.gradle.plugin-publish") version "1.3.1"
+    id("com.gradle.plugin-publish") version "2.2.1"
 }
 
 group = "eu.innuto"
@@ -53,6 +54,12 @@ gradlePlugin {
             description = "Draws a ribbon (e.g. DEBUG, STAGING) over Android launcher icons, " +
                 "configured per product flavor and build type. Supports PNG/WebP and adaptive icons."
             tags = listOf("android", "launcher-icon", "icon", "ribbon", "banner", "flavor", "build-type")
+            compatibility {
+                features {
+                    // Checked with the sample app (configuration cache stored and reused).
+                    configurationCache = true
+                }
+            }
         }
     }
 }
