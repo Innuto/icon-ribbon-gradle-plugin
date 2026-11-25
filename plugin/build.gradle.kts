@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     `java-gradle-plugin`
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.4.21"
     id("com.gradle.plugin-publish") version "2.2.1"
 }
 
@@ -31,7 +31,7 @@ dependencies {
     // Compiled against the public AGP API only; the host build supplies the real AGP at runtime.
     compileOnly("com.android.tools.build:gradle-api:8.10.1")
     // Lets ImageIO decode .webp launcher icons (writing is done as PNG).
-    implementation("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
+    implementation("com.twelvemonkeys.imageio:imageio-webp:3.15.3")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
