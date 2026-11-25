@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     `java-gradle-plugin`
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.4.21"
     id("com.gradle.plugin-publish") version "2.2.1"
 }
 
@@ -20,10 +20,11 @@ java {
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
-        // Build scripts are compiled by the Kotlin embedded in the user's Gradle (1.8 in Gradle 8.0),
-        // which can't read metadata from a newer Kotlin; keep the public `iconRibbon { }` accessors readable.
-        apiVersion = KotlinVersion.KOTLIN_1_8
-        languageVersion = KotlinVersion.KOTLIN_1_8
+        // Build scripts are compiled by the Kotlin embedded in the user's Gradle, which reads metadata
+        // at most one version newer than itself. The oldest supported Gradle (8.6, for AGP 8.4) embeds
+        // Kotlin 1.9, so 2.0 keeps the public `iconRibbon { }` accessors readable there.
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
     }
 }
 
@@ -31,7 +32,7 @@ dependencies {
     // Compiled against the public AGP API only; the host build supplies the real AGP at runtime.
     compileOnly("com.android.tools.build:gradle-api:8.10.1")
     // Lets ImageIO decode .webp launcher icons (writing is done as PNG).
-    implementation("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
+    implementation("com.twelvemonkeys.imageio:imageio-webp:3.15.3")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
@@ -44,15 +45,16 @@ tasks.test {
 }
 
 // Functional tests: real Android builds in temporary projects, run through Gradle TestKit.
-val functionalTest: SourceSet by sourceSets.creating
-gradlePlugin.testSourceSets(functionalTest)
+val functionalTest: SourceSet = sourceSets.create("functionalTest")
+// Replaces the default list, so `test` is named again: Gradle 9.4+ puts gradleApi() only on registered sets.
+gradlePlugin.testSourceSets(sourceSets.test.get(), functionalTest)
 configurations[functionalTest.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
 configurations[functionalTest.runtimeOnlyConfigurationName].extendsFrom(configurations.testRuntimeOnly.get())
 
 // The AGP the test builds run with, e.g. `-PtestAgpVersion=8.4.2`. It goes onto the injected plugin
 // classpath next to this plugin; applied separately, its classes would be invisible to ours.
 val testAgpVersion = providers.gradleProperty("testAgpVersion").orElse("8.10.1")
-val testAgp: Configuration by configurations.creating {
+val testAgp: Configuration = configurations.create("testAgp") {
     isCanBeConsumed = false
     isCanBeResolved = true
 }
