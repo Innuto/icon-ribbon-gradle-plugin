@@ -8,11 +8,10 @@ updates:
       github-actions:
         patterns: ["*"]
 
-  # "/" holds the sample's AGP and the Gradle wrapper, "/plugin" the plugin's own build.
+  # "/" covers the sample's AGP, the Gradle wrapper and, through includeBuild("plugin"), the
+  # plugin's own build. Listing "/plugin" as well opened every plugin update twice.
   - package-ecosystem: "gradle"
-    directories:
-      - "/"
-      - "/plugin"
+    directory: "/"
     schedule:
       interval: "monthly"
     groups:
